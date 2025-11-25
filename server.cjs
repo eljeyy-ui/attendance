@@ -1,12 +1,23 @@
-console.log("RUNNING SERVER...");
+require("dotenv").config();
+const { Pool } = require("pg");
 
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false }
+});
+
+
+const pool = require("./db.js");
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const path = require("path");
-const { Pool } = require("pg");
 
-const app = express(); // MUST come before middlewares
+
+console.log("RUNNING SERVER...");
+
+const app = express();
+
 
 // Middleware
 app.use(cors());
@@ -17,13 +28,11 @@ app.use(express.json());   // IMPORTANT — FIXES EMPTY req.body
 app.use(express.static(path.join(__dirname, "public")));
 console.log("STATIC PATH:", path.join(__dirname, "public"));
 
-// PostgreSQL connection
 const pool = new Pool({
-    host: "localhost",
-    port: 5432,
-    user: "postgres",
-    password: "1234",
-    database: "attendance_db"
+    connectionString: process.env.DATABASE_URL,
+    ssl: {
+        rejectUnauthorized: false
+    }
 });
 
 // Test route
@@ -99,8 +108,8 @@ app.post("/attendance", async (req, res) => {
     }
 });
 
-// Start server
-const PORT = 4000;
+const PORT = process.env.PORT || 3000;
+
 app.listen(PORT, () => {
-    console.log(`Server running at http://localhost:${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });
