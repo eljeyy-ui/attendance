@@ -6,17 +6,15 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false }
 });
 
+console.log("RUNNING SERVER...");
 
-const pool = require("./db.js");
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const path = require("path");
 
-
-console.log("RUNNING SERVER...");
-
 const app = express();
+
 
 
 // Middleware
