@@ -1,35 +1,68 @@
-require("dotenv").config();
-const express = require("express");
-const cors = require("cors");
-const bodyParser = require("body-parser");
-const path = require("path");
+// server.cjs
+import express from "express";
+import cors from "cors";
+import db from "./db.js"; // your database connection file
+import dotenv from "dotenv";
 
-// Use pool from db.js
-const pool = require("./db.js");
-
-console.log("RUNNING SERVER...");
+dotenv.config();
 
 const app = express();
 
 // Middleware
 app.use(cors());
-app.use(bodyParser.json());
 app.use(express.json());
 
-// Example test route
+// ---- TEST ROUTE ----
 app.get("/test", async (req, res) => {
-  try {
-    const result = await pool.query("SELECT NOW()");
-    res.json(result.rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Database error" });
-  }
+    try {
+        const result = await db.query("SELECT NOW()");
+        res.json(result.rows);
+    } catch (error) {
+        console.error("Test route error:", error);
+        res.status(500).json({ error: "Database error" });
+    }
 });
 
-// Serve frontend
-app.use(express.static("public"));
+// ---- REGISTER STUDENT ----
+app.post("/students", async (req, res) => {
+    try {
+        const {
+            last_name,
+            given_name,
+            middle_name,
+            extension,
+            student_number,
+            course_year_section,
+            email
+        } = req.body;
 
-app.listen(process.env.PORT || 4000, () =>
-  console.log("Server running on port", process.env.PORT || 4000)
-);
+        const result = await db.query(
+            `INSERT INTO students 
+                (last_name, given_name, middle_name, extension, student_number, course_year_section, email)
+             VALUES ($1, $2, $3, $4, $5, $6, $7)
+             RETURNING *`,
+            [
+                last_name,
+                given_name,
+                middle_name,
+                extension,
+                student_number,
+                course_year_section,
+                email
+            ]
+        );
+
+        res.status(201).json({ success: true, student: result.rows[0] });
+
+    } catch (error) {
+        console.error("Error inserting student:", error);
+        res.status(500).json({ error: "Database error" });
+    }
+});
+
+// ---- START SERVER ----
+const PORT = process.env.PORT || 10000;
+
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
