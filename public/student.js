@@ -1,33 +1,38 @@
-document.getElementById("studentForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
+document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById("studentForm");
 
-    const student = {
-        last_name: document.getElementById("studentLastName").value,
-        given_name: document.getElementById("studentGivenName").value,
-        middle_name: document.getElementById("studentMiddleName").value,
-        extension: document.getElementById("studentExtension").value,
-        student_number: document.getElementById("studentNumber").value,
-        year_section: document.getElementById("yearSection").value,
-        email: document.getElementById("studentEmail").value
-    };
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
 
-    try {
-        const response = await fetch(`${window.API_URL}/students`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(student)
-        });
+        const data = {
+            first_name: document.getElementById("first_name").value,
+            last_name: document.getElementById("last_name").value,
+            age: document.getElementById("age").value,
+            gender: document.getElementById("gender").value,
+            program: document.getElementById("program").value,
+        };
 
-        const result = await response.json();
+        try {
+            const response = await fetch(`${API_URL}/students`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            });
 
-        if (result.success) {
-            alert("Student registered successfully!");
-            document.getElementById("studentForm").reset();
-        } else {
-            alert("Error: " + result.error);
+            const result = await response.json();
+
+            if (response.ok) {
+                alert("Student registered successfully!");
+                form.reset();
+            } else {
+                alert("Error: " + result.error);
+            }
+        } catch (error) {
+            console.error("Fetch error:", error);
+            alert("Failed to connect to server.");
         }
-    } catch (error) {
-        alert("Failed to connect to server. Make sure the backend is running.");
-    }
+    });
 });
 
