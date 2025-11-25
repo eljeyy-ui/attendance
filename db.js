@@ -1,12 +1,11 @@
-console.log("DB file loaded!");
+require("dotenv").config();
+const { Pool } = require("pg");
 
-import pkg from "pg";
-const { Pool } = pkg;
-
-export const db = new Pool({
-    user: "postgres",
-    host: "localhost",
-    database: "attendance_db",
-    password: "1234",
-    port: 5432
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false }
 });
+
+console.log("DB connected!");
+
+module.exports = pool;
