@@ -1,10 +1,10 @@
-const API_URL = "https://atten-fki3.onrender.com";
+const API_URL = "https://attendance-87vv.onrender.com";
 
-ocument.getElementById("loginBtn").addEventListener("click", async () => {
+document.getElementById("loginBtn").addEventListener("click", async () => {
     const email = document.getElementById("teacherEmail").value.trim();
     const password = document.getElementById("teacherPassword").value.trim();
 
-    if (email !== "admin@gmail.com" || password !== "admin123") {
+    if (email !== "admin@gmail.com" || !email.includes("@") || password !== "admin123") {
         alert("Invalid login credentials.");
         return;
     }
@@ -45,4 +45,3 @@ async function loadStudents() {
         alert("Failed to load students.");
     }
 }
-;

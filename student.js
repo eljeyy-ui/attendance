@@ -1,4 +1,4 @@
-const API_URL = "https://atten-fki3.onrender.com";
+const API_URL = "https://attendance-87vv.onrender.com";
 
 document.getElementById("studentForm").addEventListener("submit", async function (e) {
     e.preventDefault();
