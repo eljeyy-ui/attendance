@@ -1,70 +1,62 @@
-const API_URL = "https://attendance-87vv.onrender.com";
+// student.js
+// Uses global window.API_URL (from config.js)
 
-document.getElementById("studentForm").addEventListener("submit", async function (e) {
-    e.preventDefault();
+const API = window.API_URL || "https://attendance-87vv.onrender.com";
 
-    const lastName = document.getElementById("studentLastName").value.trim();
-    const givenName = document.getElementById("studentGivenName").value.trim();
-    const middleName = document.getElementById("studentMiddleName").value.trim();
-    const extension = document.getElementById("studentExtension").value.trim();
-    const studentNumber = document.getElementById("studentNumber").value.trim();
-    const course = document.getElementById("yearSection").value.trim();
-    const email = document.getElementById("studentEmail").value.trim();
+const form = document.getElementById("studentForm");
 
-    // Clear errors
-    document.querySelectorAll(".field-error").forEach(el => el.textContent = "");
+function clearErrors(){
+  document.querySelectorAll(".input-error").forEach(n => n.textContent = "");
+}
 
-    // Validate required fields
-    let hasError = false;
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  clearErrors();
 
-    if (!lastName) {
-        document.getElementById("lastNameError").textContent = "Last name is required.";
-        hasError = true;
+  const givenName = document.getElementById("studentGivenName").value.trim();
+  const lastName = document.getElementById("studentLastName").value.trim();
+  const studentNumber = document.getElementById("studentNumber").value.trim();
+  const yearSection = document.getElementById("yearSection").value.trim();
+  const email = document.getElementById("studentEmail").value.trim();
+
+  let hasError = false;
+  if(!givenName){ document.getElementById("givenNameError").textContent = "Required"; hasError=true; }
+  if(!lastName){ document.getElementById("lastNameError").textContent = "Required"; hasError=true; }
+  if(!studentNumber){ document.getElementById("studentNumberError").textContent = "Required"; hasError=true; }
+  if(!yearSection){ document.getElementById("yearSectionError").textContent = "Required"; hasError=true; }
+  if(!email){ document.getElementById("emailError").textContent = "Required"; hasError=true; }
+
+  if(hasError) return;
+
+  // server expects snake_case fields (based on server.mjs)
+  const payload = {
+    last_name: lastName,
+    given_name: givenName,
+    middle_name: "",
+    extension: "",
+    student_number: studentNumber,
+    year_section: yearSection,
+    email: email,
+    photo: ""
+  };
+
+  try {
+    const res = await fetch(`${API}/students`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+    if(!res.ok){
+      alert("Server error: " + (data.error || res.statusText));
+      return;
     }
-    if (!givenName) {
-        document.getElementById("givenNameError").textContent = "Given name is required.";
-        hasError = true;
-    }
-    if (!studentNumber) {
-        document.getElementById("studentNumberError").textContent = "Student number is required.";
-        hasError = true;
-    }
-    if (!course) {
-        document.getElementById("yearSectionError").textContent = "Course/Year/Section required.";
-        hasError = true;
-    }
-    if (!email) {
-        document.getElementById("emailError").textContent = "Email is required.";
-        hasError = true;
-    }
 
-    if (hasError) return;
-
-    try {
-        const response = await fetch(`${API_URL}/students`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                lastName,
-                givenName,
-                middleName,
-                extension,
-                studentNumber,
-                course,
-                email
-            })
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-            alert("Student registered successfully!");
-            document.getElementById("studentForm").reset();
-        } else {
-            alert("Error: " + data.error);
-        }
-
-    } catch (error) {
-        alert("Failed to connect to the server. Please try again.");
-    }
+    alert("Student registered!");
+    form.reset();
+  } catch (err) {
+    console.error(err);
+    alert("Network error: failed to reach server. Check API URL or Render service.");
+  }
 });
