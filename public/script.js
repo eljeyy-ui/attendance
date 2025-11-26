@@ -1,3 +1,5 @@
+const API_URL = "https://atten-fki3.onrender.com";
+
 function goBack() {
     window.location.href = 'index.html';
 }
@@ -39,7 +41,7 @@ async function registerStudent(name, number, yearSection, photo) {
     };
 
     try {
-        const response = await fetch("https://attendance-87vv.onrender.com/students", {
+        const response = await fetch(`${API_URL}/students`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(student)

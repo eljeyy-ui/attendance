@@ -1,4 +1,6 @@
-document.getElementById("loginBtn").addEventListener("click", async () => {
+const API_URL = "https://atten-fki3.onrender.com";
+
+ocument.getElementById("loginBtn").addEventListener("click", async () => {
     const email = document.getElementById("teacherEmail").value.trim();
     const password = document.getElementById("teacherPassword").value.trim();
 
